@@ -1,2 +1,60 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# You are asked to find a card from a bunch of cards that are arranged in descending order
+# things i have learnt
+# 1. how to use binary search
+#2. functions are first-class objects,i.e they can be passed as arguments to other functions,assigend variables..
+#3. closure: a function that returns another function
+
+def binary_search(cards,query,position):
+        lo=0
+        hi=len(cards)-1
+        while (lo<=hi): #ensuring we have a valid list to work with
+            mid=(hi+lo)//2
+            res=position(mid)
+            if res=='left': #look in the left slice
+                hi=mid-1
+            elif res=='right': #look in the right slice
+                lo=mid+1
+            elif res=='found':
+                return mid
+        return -1 #if not found
+
+
+def locate_cards(cards,query):
+    def position(mid): #arguments in the outer func are accessible in the inner func
+        if (cards[mid]==query):
+            if (cards[mid-1]==query and mid>=1): #checking index validity and 1st appearance
+                return 'left' #since it is not the first appearance for the card
+            else:
+                return 'found'
+        elif (cards[mid]>query):
+            return 'right' #indicating u need to lopk in the right slice
+        elif (cards[mid]<query):
+            return 'left' #indicating u need to lopk in the left slice
+    return binary_search(cards,query,position)
+
+
+possible_test_cases=[
+    [ {(4,3,2,1):4} , 0], #dictionary keys in python need to be immutable, format [{cards:query},expected_outcome]
+    [ {(4,3,2,1):1} , 3],  #first and last place
+    [ {(4,3,2,1):3} , 1],  #in the middle
+    [ {(4,3,2,1,0,-1,-2,-3):-2} ,6],  #somewhere in the middle
+    [ {(4,3,2,1):0} , -1], #nonexistent query 
+    [ {(4,3,3,3,2,1):3} ,1] #multiple time existenet query returned value is first appearance
+]
+
+#Testing
+
+i=1
+for test_case in possible_test_cases:
+    while (i<=6):
+        print(f"Test case {i}")
+        i+=1
+        dictionary_1 =test_case[0]
+        for key,value in dictionary_1.items():
+            cards=key
+            query=value
+        result=locate_cards(cards,query)
+        if (result==test_case[1]):
+            print("PASS")
+        else:
+            print("FAIL")
